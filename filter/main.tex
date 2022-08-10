@@ -356,7 +356,12 @@ resulting in \eqref{eq:shift1}. Similarly, it can be shown that
 \end{equation}
 \item Obtain $X(z)$ for $x(n)$ defined in problem 
 	\ref{def:xn}.
-
+\solution From \eqref{eq:z_trans}
+\begin{align}
+    X(z) &= \sum _{n=0 }^{5}x(n)z^{-n}\\
+    &= x(0) + x(1)z^{-1} + \dots + x(5)z^{-5}\\
+    &= 1 + 2z^{-1} + 3z^{-2} + 4z^{-3} + 2z^{-4} + z^{-5}
+\end{align}
 \item Find
 %
 \begin{equation}
@@ -408,7 +413,7 @@ U(z) &= \sum _{n= 0}^{\infty}z^{-n}
 \\
 &=\frac{1}{1-z^{-1}}, \quad \abs{z} > 1
 \end{align}
-using the fomula for the sum of an infinite geometric progression.
+using the formula for the sum of an infinite geometric progression.
 %
 \item Show that 
 \begin{equation}
@@ -416,6 +421,15 @@ using the fomula for the sum of an infinite geometric progression.
 a^nu(n) \ztrans \frac{1}{1-az^{-1}} \quad \abs{z} > \abs{a}
 \end{equation}
 %
+\solution From \eqref{eq:anun} and \eqref{eq:unit_step}
+\begin{align}
+U_{a}(z) &= \sum _{n= -\infty}^{\infty}u(n)\:a^{n}z^{-n}
+\\
+&= \sum _{n= 0}^{\infty}a^{n}z^{-n}
+\\
+&=\frac{1}{1-az^{-1}}, \quad \abs{\frac{z}{a}} > 1
+\end{align}
+using the formula for the sum of an infinite geometric progression.
 \item 
 Let
 \begin{equation}
