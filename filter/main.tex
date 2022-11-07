@@ -1,6 +1,8 @@
+\hbadness=10000 \vbadness=10000
 \documentclass[journal,12pt,twocolumn]{IEEEtran}
 %
 \usepackage{setspace}
+\usepackage{textcomp}
 \usepackage{gensymb}
 \usepackage{xcolor}
 \usepackage{caption}
@@ -41,7 +43,8 @@
 
 
 %\usepackage{stmaryrd}
-
+\usepackage{polynom}
+\let\vec\mathbf
 
 %\usepackage{wasysym}
 %\newcounter{MYtempeqncnt}
@@ -72,7 +75,7 @@ columns=fullflexible
 
 \begin{document}
 %
-
+\hbadness=10000 \vbadness=10000
 \theoremstyle{definition}
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{problem}{Problem}
@@ -86,7 +89,10 @@ columns=fullflexible
 \newcommand{\BEQA}{\begin{eqnarray}}
 \newcommand{\EEQA}{\end{eqnarray}}
 \newcommand{\define}{\stackrel{\triangle}{=}}
-
+\newcommand{\myvec}[1]{\ensuremath{\begin{pmatrix}#1\end{pmatrix}}}
+\newcommand{\mybvec}[1]{\ensuremath{\begin{bmatrix}#1\end{bmatrix}}}
+\newcommand{\w}[2]{\ensuremath{W_{#1}^{#2}}}
+\newcommand{\mydet}[1]{\ensuremath{\begin{vmatrix}#1\end{vmatrix}}}
 \bibliographystyle{IEEEtran}
 %\bibliographystyle{ieeetr}
 
@@ -261,7 +267,7 @@ EE1310/master/filter/codes/Sound_Noise.wav
 %\linebreak
 \item
 \label{prob:spectrogram}
-You will find a spectrogram at \href{https://academo.org/demos/spectrum-analyzer}{\url{https://academo.org/demos/spectrum-analyzer}}. 
+You will find a spectrogram at \href{https://academo.org/demos/spectrum-analyzer}{\url{https://academo.org/demos/spectrum-analyzer}}..
 %\end{problem}
 %%
 %
@@ -324,7 +330,7 @@ wget https://github.com/gadepall/EE1310/raw/master/filter/codes/xnyn.py
 \item Repeat the above exercise using a C code.
 
 \end{enumerate}
-\section{$Z$-transform}
+\section{Z-transform}
 \begin{enumerate}[label=\thesection.\arabic*]
 \item The $Z$-transform of $x(n)$ is defined as
 %
@@ -362,6 +368,7 @@ resulting in \eqref{eq:shift1}. Similarly, it can be shown that
     &= x(0) + x(1)z^{-1} + \dots + x(5)z^{-5}\\
     &= 1 + 2z^{-1} + 3z^{-2} + 4z^{-3} + 2z^{-4} + z^{-5}
 \end{align}
+
 \item Find
 %
 \begin{equation}
@@ -433,22 +440,64 @@ using the formula for the sum of an infinite geometric progression.
 \item 
 Let
 \begin{equation}
-H\brak{e^{\j \omega}} = H\brak{z = e^{\j \omega}}.
+H\brak{e^{\text{\j} \omega}} = H\brak{z = e^{\text{\j} \omega}}.
 \end{equation}
-Plot $\abs{H\brak{e^{\j \omega}}}$.  Is it periodic? If so, find the period. $H(e^{\j \omega})$ is
+Plot $\abs{H\brak{e^{\text{\j} \omega}}}$.  Is it periodic? If so, find the period. $H(e^{\text{\j} \omega})$ is
 known as the {\em Discret Time Fourier Transform} (DTFT) of $h(n)$.
 \\
 \solution The following code plots Fig. \ref{fig:dtft}.
+\begin{align}
+	\left|H\brak{e^{\text{\j}\omega}}\right| &= \left|\frac{1 + e^{-2\text{\j}\omega}}{1 + \frac{1}{2}e^{-\text{\j}\omega}}\right| \\
+											 &= \sqrt{\frac{\brak{1 + \cos{2\omega}}^2 + \brak{\sin{2\omega}}^2}{\brak{1 + \frac{1}{2}\cos{\omega}}^2 + \brak{\frac{1}{2}\sin{\omega}}^2}} \\
+											 &= \sqrt{\frac{2\brak{1 + \cos{2\omega}}}{\frac{5}{4} + \cos{\omega}}}				  		 
+\end{align}
+\begin{align}
+									&= \sqrt{\frac{2\brak{2\cos^2{\omega}}}{\frac{5}{4} + \cos{\omega}}} \\
+									&= \frac{4|\cos{\omega}|}{\sqrt{5 + 4\cos{\omega}}}
+\end{align}
+Thus,
+\begin{align}
+	H\brak{e^{\text{\j}\brak{\omega + 2\pi}}} &= \frac{4|\cos\brak{\omega + 2\pi}|}{\sqrt{5 + 4\cos\brak{\omega + 2\pi}}} \\
+											   &= \frac{4|\cos{\omega}|}{\sqrt{5 + 4\cos{\omega}}} \\
+											   &= H\brak{e^{\text{\j}\omega}}
+\end{align}
+So, the fundamental period is $2\pi$.
+
 \begin{lstlisting}
 wget https://raw.githubusercontent.com/gadepall/EE1310/master/filter/codes/dtft.py
 \end{lstlisting}
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=\columnwidth]{./figs/dtft}
-\caption{$\abs{H\brak{e^{\j\omega}}}$}
+\caption{$\abs{H\brak{e^{\text{\j}\omega}}}$}
 \label{fig:dtft}
 \end{figure}
-\item Express $h(n)$ in terms of $H\brak{e^{\j \omega}}$.
+\item Express $h(n)$ in terms of $H\brak{e^{\text{\j} \omega}}$.\\
+\solution We have,
+\begin{align}
+	H(e^{\text{\j}\omega}) &= \sum_{k = -\infty}^{\infty}h(k)e^{-\text{\j}\omega k}
+\end{align}
+
+\begin{align}
+	\int_{-\pi}^{\pi}e^{\text{\j}\omega(n - k)}d\omega =
+	\begin{cases}
+		2\pi & n = k \\
+		0 & \textrm{otherwise}
+	\end{cases}
+\end{align}
+
+From the above equations, we have 
+\begin{align}
+	&\frac{1}{2\pi}\int_{-\pi}^{\pi}H(e^{\text{\j}\omega})e^{j\omega n}d\omega \\
+	&= \frac{1}{2\pi}\sum_{k = -\infty}^{\infty}\int_{-\pi}^{\pi}h(k)e^{\text{\j}\omega(n - k)}d\omega \\
+	&= \frac{1}{2\pi}2\pi h(n) = h(n)
+\end{align}
+which is known as the Inverse Discrete Fourier Transform. 
+\begin{align}
+ 	h(n) &= \frac{1}{2\pi}\int_{-\pi}^{\pi}H(e^{\text{\j}\omega})e^{\text{\j}\omega n}d\omega 
+% 		 &= \frac{1}{2\pi}\int_{-\pi}^{\pi}\frac{1 + e^{-2\text{\j}\omega}}{1 + \frac{1}{2}e^{-\text{\j}\omega}}e^{\text{\j}\omega n}d\omega
+% 	\label{eq:idtft}
+\end{align}
 \end{enumerate}
 
 \section{Impulse Response}
@@ -460,8 +509,26 @@ find
 		\end{align}
 		for H(z) in 
 		\eqref{eq:freq_resp}.
-\item \label{prob:impulse_resp}
+\\
+\solution Using the substitution $x := z^{-1}$, we perform long division.
+
+\polylongdiv{1 + x^2}{1 + \frac{1}{2}x}\\
+Thus,
+\begin{align}
+	H(z) &= -4 + 2z^{-1} + \frac{5}{1 + \frac{1}{2}z^{-1}} \\
+			&= -4 + 2z^{-1} + 5\sum_{n = 0}^{\infty}\brak{-\frac{1}{2}}^nz^{-n} \\
+			&= 1 - \frac{1}{2}z^{-1} + 5\sum_{n = 2}^{\infty}\brak{-\frac{1}{2}}^nz^{-n} \\
+			&= \sum_{n = 0}^{\infty}\brak{-\frac{1}{2}}^nz^{-n} + 4\sum_{n = 2}^{\infty}\brak{-\frac{1}{2}}^nz^{-n} \\
+			&= \sum_{n = -\infty}^{\infty}u(n)\brak{-\frac{1}{2}}^nz^{-n} + \nonumber \\
+			&\sum_{n = -\infty}^{\infty}u(n - 2)\brak{-\frac{1}{2}}^{n - 2}z^{-n}
+\end{align}
+Therefore, from \eqref{eq:z_trans}, 
+\begin{align}
+	h(n) = \brak{-\frac{1}{2}}^{n}u(n) + \brak{-\frac{1}{2}}^{n-2}u(n-2)
+\end{align}
+\item\label{prob:impulse_resp}
 Find an expression for $h(n)$ using $H(z)$, given that 
+
 %in Problem \ref{eq:ztransab} and \eqref{eq:anun}, given that
 \begin{equation}
 \label{eq:impulse_resp}
@@ -475,6 +542,7 @@ system defined by \eqref{eq:iir_filter}.
 H(z) &= \frac{1}{1 + \frac{1}{2}z^{-1}} + \frac{ z^{-2}}{1 + \frac{1}{2}z^{-1}}
 \\
 \implies h(n) &= \brak{-\frac{1}{2}}^{n}u(n) + \brak{-\frac{1}{2}}^{n-2}u(n-2)
+\label{eq:h(n)}
 \end{align}
 using \eqref{eq:anun} and \eqref{eq:z_trans_shift}.
 \item Sketch $h(n)$. Is it bounded? Justify theoretically.
@@ -491,12 +559,38 @@ wget https://raw.githubusercontent.com/gadepall/EE1310/master/filter/codes/hn.py
 \end{figure}
 %
 \item Convergent? Justify using the ratio test.
+\solution
+For large $n$, we see that 
+\begin{align}
+	h(n) &= \brak{-\frac{1}{2}}^n + \brak{-\frac{1}{2}}^{n - 2} \\
+		 &= \brak{-\frac{1}{2}}^{n}\brak{4 + 1} = 5\brak{-\frac{1}{2}}^n \\
+		 &\implies \left|\frac{h(n + 1)}{h(n)}\right| = \frac{1}{2}
+\end{align}
+and therefore, $\lim_{n \to \infty}\left|\frac{h(n + 1)}{h(n)}\right| = \frac{1}{2} < 1$. Hence, we see that $h(n)$ converges.
 \item The system with $h(n)$ is defined to be stable if
 \begin{equation}
 \sum_{n=-\infty}^{\infty}h(n) < \infty
 \end{equation}
+
 Is the system defined by \eqref{eq:iir_filter} stable for the impulse response in \eqref{eq:impulse_resp}?
 %
+\\
+\solution: From (\ref{eq:h(n)}),
+\begin{equation}
+    h(n) = \brak{-\frac{1}{2}}^{n}u(n) + \brak{-\frac{1}{2}}^{n-2}u(n-2) 
+\end{equation}
+then 
+\begin{equation}
+    \sum_{n=-\infty}^{\infty}h(n) = \sum_{n=0}^{\infty} \brak{-\frac{1}{2}}^{n} + \sum_{n=2}^{\infty} \brak{-\frac{1}{2}}^{n-2}
+\end{equation}
+\begin{equation}
+    \sum_{n=-\infty}^{\infty}h(n) = \frac{4}{3}
+\end{equation}
+since 
+\begin{equation}
+    \sum_{n=-\infty}^{\infty}h(n) < \infty
+\end{equation}
+$h(n)$ is stable.
 \item Verify the above result using a python code.
 \item 
 Compute and sketch $h(n)$ using 
@@ -536,7 +630,7 @@ $y(n)$ in  Fig.
 \ref{fig:xnyn}. 
 %
 \begin{lstlisting}
-wget https://raw.githubusercontent.com/gadepall/EE1310/master/filter/codes/ynconv.py
+wget https://raw.githubusercontent.com/DeepakReddyVelagala/EE1310/main/filter/codes/ynconv.py
 \end{lstlisting}
 \begin{figure}[!ht]
 \centering
@@ -545,29 +639,80 @@ wget https://raw.githubusercontent.com/gadepall/EE1310/master/filter/codes/yncon
 \label{fig:ynconv}
 \end{figure}
 \item Express the above convolution using a Teoplitz matrix.
-
+\\
+\solution We use Toeplitz matrices for convolution
+\begin{align}
+	\mtx{y} &= \mtx{x} \circledast \mtx{h}\\
+	\mtx{y} &= 
+	\begin{pmatrix}
+		h_1 & 0 & . & . & . & 0 \\
+		h_2 & h_1 & . & . & . & 0 \\
+		h_3 & h_2 & h_1 & . & . & 0 \\
+		. & . & . & . & . & . \\
+		0 & . & . & h_3 & h_2 & h_1 \\
+		0 & . & . & . & h_2 & h_1 \\
+		0 & . & . & . & 0 & h_1
+	\end{pmatrix}
+	\begin{pmatrix}
+		x_1 \\ x_2 \\ \vdots \\ x_n
+	\end{pmatrix}
+\end{align}
 \item Show that
 \begin{equation}
 y(n) =  \sum_{n=-\infty}^{\infty}x(n-k)h(k)
 \end{equation}
+\\
+
+\solution From \eqref{eq:convolution}, we substitute $k := n - k$ to get
+\begin{align}
+y\brak{n} &= \sum_{k=-\infty}^{\infty}x\brak{k}h\brak{n - k} \\
+		  &= \sum_{n - k=-\infty}^{\infty}x\brak{n - k}h\brak{k} \\
+		  &= \sum_{k=-\infty}^{\infty}x\brak{n - k}h\brak{k}
+\end{align}
 \end{enumerate}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% DFT AND FFT %%%%%%%%%%%%%%%
 %
 \section{DFT and FFT}
 \begin{enumerate}[label=\thesection.\arabic*]
 \item
 Compute
 \begin{equation}
-X(k) \define \sum _{n=0}^{N-1}x(n) e^{-\j2\pi kn/N}, \quad k = 0,1,\dots, N-1
+X(k) \define \sum _{n=0}^{N-1}x(n) e^{-\text{\j}2\pi kn/N}, \quad k = 0,1,\dots, N-1
 \end{equation}
-and $H(k)$ using $h(n)$.
+and $H(k)$ using $h(n)$. \\
+\solution The following code plots $X(k)$ and $H(k)$.
+\begin{lstlisting}
+    https://github.com/DeepakReddyVelagala/EE3900/blob/main/EE3900-2022-main/filter/codes/XkHk_dft.py
+\end{lstlisting}
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=\columnwidth]{figs/Xk_Hk.png}
+\caption{}
+\label{fig:Hk_Xk}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%% 6.2 %%%%%%%%%%%%%%%%%%%%%%%%555
 \item Compute 
 \begin{equation}
 Y(k) = X(k)H(k)
 \end{equation}
+\solution The following code plots $Y(k)$.
+\begin{lstlisting}
+    https://github.com/DeepakReddyVelagala/EE3900/blob/main/EE3900-2022-main/filter/codes/Yk.py
+\end{lstlisting}
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=\columnwidth]{figs/Yk.png}
+\caption{}
+\label{fig:Yk}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%% 6.3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \item Compute
 \begin{equation}
- y\brak{n}={\frac {1}{N}}\sum _{k=0}^{N-1}Y\brak{k}\cdot e^{\j 2\pi kn/N},\quad n = 0,1,\dots, N-1
+ y\brak{n}={\frac {1}{N}}\sum _{k=0}^{N-1}Y\brak{k}\cdot e^{\text{\j} 2\pi kn/N},\quad n = 0,1,\dots, N-1
 \end{equation}
 \\
 \solution The following code plots Fig. \ref{fig:ynconv}. Note that this is the same as 
@@ -584,14 +729,898 @@ wget https://raw.githubusercontent.com/gadepall/EE1310/master/filter/codes/yndft
 \label{fig:yndft}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 6.4 %%%%%%%%%%%%%%%%%
 \item Repeat the previous exercise by computing $X(k), H(k)$ and $y(n)$ through FFT and 
 IFFT.
-\item Wherever possible, express all the above equations as matrix equations.
-\item Verify the above equations by generating the DFT matrix in python.
+\solution The following code plots $X(k)$, $H(k)$ and $y(n)$ by fft.
+\begin{lstlisting}
+    https://github.com/DeepakReddyVelagala/EE3900/blob/main/EE3900-2022-main/filter/codes/Xk_Hk_fft.
+\end{lstlisting}
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=\columnwidth]{figs/Xk-Hk-Yn_fft.png}
+\caption{$X(k)~$, $H(k)$ and $y(n)$ from fft and IFFT}
+\label{fig:Xk_Hk_yn}
+\end{figure}
+
+%\item Wherever possible, express all the above equations as matrix equations.
+%\item Verify the above equations by generating the DFT matrix in python.
 \end{enumerate}
 %
-\section{Exercises}
 
+%%%%%%%%%%%%%%%%%%%%%% FFT %%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{FFT}
+\begin{enumerate}[label=\thesection.\arabic*]
+% \subsection{Definitions}
+% \begin{enumerate}[label=\arabic*.,ref=\thesection.\theenumi]
+\numberwithin{equation}{section}
+    \item The DFT of $x(n)$ is given by
+    \begin{align}
+        X(k) \triangleq \sum_{n=0}^{N-1} x(n) e^{-j 2 \pi k n / N}, \quad k=0,1, \ldots, N-1
+    \end{align}
+\item Let 
+	\begin{align}
+W_{N} = e^{-j2\pi/N} 
+	\end{align}
+		Then the $N$-point {\em DFT matrix} is defined as 
+	\begin{align}
+		\vec{F}_{N} = \sbrak{W_{N}^{mn}}
+	\end{align}
+	where $W_{N}^{mn}$ are the elements of $\vec{F}_{N}$.
+\item Let 
+	\begin{align}
+		\vec{I}_4 = \myvec{\vec{e}_4^{1} &\vec{e}_4^{2} &\vec{e}_4^{3} &\vec{e}_4^{4} }
+	\end{align}
+		be the $4\times 4$ identity matrix.  Then the 4 point {\em DFT permutation matrix} is defined as 
+	\begin{align}
+		\vec{P}_4 = \myvec{\vec{e}_4^{1} &\vec{e}_4^{3} &\vec{e}_4^{2} &\vec{e}_4^{4} }
+	\end{align}
+\item The 4 point {\em DFT diagonal matrix} is defined as 
+	\begin{align}
+		\vec{D}_4 = diag\myvec{W_{N}^{0} & W_{N}^{1} & W_{N}^{2} & W_{N}^{3}}
+	\end{align}
+%\end{enumerate}
+
+
+ %%%%%%%%%%%%%%%%%%%%%%%%% Problems %%%%%%%%%%%%%%
+% \subsection{Problems}
+
+%\begin{enumerate}[label=\arabic*.,ref=\thesection.\theenumi]
+%\numberwithin{equation}{section}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1 %%%%%%%%%%%%%%%%%%%%%%%
+\item Show that 
+\begin{equation}
+    W_{N}^{2}=W_{N/2}
+	\label{eq:n-2}
+\end{equation}
+\solution We know that.
+\begin{equation}
+    W_{N} = e^{-j2\pi/N} 
+\end{equation}
+Then 
+\begin{align}
+    W_{N/2} = e^{-2*j2\pi/N} \\
+    W_{N/2} = {W_{N}}^{2}
+\end{align}
+Hence Proved.
+%%%%%%%%%%%%%%%%%%%%%%%%%%% 2 %%%%%%%%%%%%%%%%%%%%%
+    \item Find $\vec{P}_6$. \\
+    \solution 
+	\begin{equation}
+		\vec{I}_6 = \myvec{\vec{e}_6^{1} &\vec{e}_6^{2} &\vec{e}_6^{3} &\vec{e}_6^{4} &\vec{e}_6^{5} &\vec{e}_6^{6} }
+	\end{equation}
+	Now to find the $\vec{p}_6$ we have to seperate odd columns and even columns
+	Then 
+	\begin{equation}
+		\vec{P}_6 = \myvec{\vec{e}_6^{1} &\vec{e}_6^{3} &\vec{e}_6^{5} &\vec{e}_6^{2} &\vec{e}_6^{4} &\vec{e}_6^{6} }
+	\end{equation}
+	\begin{equation}
+		\vec{P}_6 =
+		\myvec{
+			1 & 0 & 0 & 0 & 0 & 0\\
+			0 & 0 & 0 & 1 & 0 & 0\\
+			0 & 1 & 0 & 0 & 0 & 0\\
+			0 & 0 & 0 & 0 & 1 & 0\\
+			0 & 0 & 1 & 0 & 0 & 0\\
+			0 & 0 & 0 & 0 & 0 & 1\\
+		}
+	\end{equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%% 3 %%%%%%%%%%%%%%%%%%%%
+    \item Find $\vec{D}_3$. \\
+    \solution 
+\begin{equation}
+    \vec{D}_3 = diag\myvec{W_{3}^{0} & W_{3}^{1} & W_{3}^{2}}
+\end{equation}
+\begin{equation}
+    \vec{D}_3 =
+    \myvec{
+        W^{0}_{3} & 0 & 0\\
+        0 & W^{1}_{3} & 0\\
+        0 & 0 & W^{2}_{3}\\
+            }
+\end{equation}
+%%%%%%%%%%%%%%%%%%%%%%%%% 4 %%%%%%%%%%%%%%%%%%%%
+    \item Show that 
+\begin{equation}
+	\vec{F}_{4}=
+\begin{bmatrix}
+	\vec{I}_{2} & \vec{D}_{2} \\
+\vec{I}_{2} & -\vec{D}_{2}
+\end{bmatrix}
+\begin{bmatrix}
+\vec{F}_{2} & 0 \\
+0 & \vec{F}_{2}
+\end{bmatrix}
+\vec{P}_{4}
+\label{eq:fft-recurrence}
+\end{equation} \\
+\solution Observe that for $n \in \mathbb{N}$, $W_4^{4n} = 1$ and $W_4^{4n + 2} = -1$. Using \eqref{eq:n-2},
+
+\begin{align}
+	\vec{D}_2\vec{F}_2 &= \mybvec{\w{4}{0} & 0 \\ 0 & \w{4}{1}}\mybvec{\w{2}{0} & \w{2}{0} \\ \w{2}{0} & \w{2}{1}} \\
+					   &= \mybvec{\w{4}{0} & 0 \\ 0 & \w{4}{1}}\mybvec{\w{4}{0} & \w{4}{0} \\ \w{4}{0} & \w{4}{2}} \\
+					   &= \mybvec{\w{4}{0} & \w{4}{0} \\ \w{4}{1} & \w{4}{3}} \label{eq:fft-df1} \\
+	\implies -\vec{D}_2\vec{F}_2 &= \mybvec{\w{4}{2} & \w{4}{6} \\ \w{4}{3} & \w{4}{9}} \label{eq:fft-df2}
+\end{align}
+and
+\begin{align}
+	\vec{F}_2 &= \myvec{\w{2}{0} & \w{2}{0} \\ \w{2}{0} & \w{2}{1}} \\
+			  &= \myvec{\w{4}{0} & \w{4}{0} \\ \w{4}{0} & \w{4}{2}}
+\end{align}
+Hence,
+\begin{align}
+	\vec{W}_4 &= \myvec{\w{4}{0} & \w{4}{0} & \w{4}{0} & \w{4}{0} \\
+		\w{4}{0} & \w{4}{2} & \w{4}{1} & \w{4}{3} \\
+		\w{4}{0} & \w{4}{4} & \w{4}{2} & \w{4}{6} \\
+		\w{4}{0} & \w{4}{6} & \w{4}{3} & \w{4}{9} 
+	} \label{eq:fft-permutation} \\
+	&= \mybvec{\vec{I}_2\vec{F}_2 & \vec{D}_2{F}_2 \\ \vec{I}_2\vec{F}_2 & -\vec{D}_2{F}_2} \\
+	&= \mybvec{\vec{I}_2 & \vec{D}_2 \\ \vec{I}_2 & \vec{D}_2}\mybvec{\vec{F}_2 & 0 \\ 0 & \vec{F}_2}
+	\label{eq:ifd}
+\end{align}
+Multiplying \eqref{eq:ifd} by $\vec{P}_4$ on both sides, and noting that $\vec{W}_4\vec{P}_4 = \vec{F}_4$ gives us \eqref{eq:fft-recurrence}.
+\\
+
+%%%%%%%%%%%%%%%%%%%%% 5 %%%%%%%%%%%%%%%%%%%%%%
+\item Show that 
+\begin{equation}
+\vec{F}_{N}=
+\begin{bmatrix}
+\vec{I}_{N/2} & \vec{D}_{N/2} \\
+\vec{I}_{N/2} & -\vec{D}_{N/2}
+\end{bmatrix}
+\begin{bmatrix}
+\vec{F}_{N/2} & 0 \\
+0 & \vec{F}_{N/2}
+\end{bmatrix}
+\vec{P}_{N}
+\end{equation}
+\solution Observe that for even $N$ and letting $\vec{f}_N^i$ denote the $i^{\text{th}}$ column of $\vec{F}_N$, from \eqref{eq:fft-df1} and \eqref{eq:fft-df2},
+\begin{align}
+	\myvec{\vec{D}_{N/2}\vec{F}_{N/2} \\ -\vec{D}_{N/2}\vec{F}_{N/2}} = \myvec{\vec{f}_N^{2} & \vec{f}_N^{4} & \ldots & \vec{f}_N^{N}}
+\end{align}
+and
+\begin{align}
+	\myvec{\vec{I}_{N/2}\vec{F}_{N/2} \\ \vec{I}_{N/2}\vec{F}_{N/2}} = \myvec{\vec{f}_N^{1} & \vec{f}_N^{3} & \ldots & \vec{f}_N^{N - 1}}
+\end{align}
+Thus,
+\begin{align}
+	&\mybvec{\vec{I}_2\vec{F}_2 & \vec{D}_2\vec{F}_2 \\ \vec{I}_2\vec{F}_2 & -\vec{D}_2\vec{F}_2} = \mybvec{\vec{I}_{N/2} & \vec{D}_{N/2} \\ \vec{I}_{N/2} & -\vec{D}_{N/2}}\mybvec{\vec{F}_{N/2} & 0 \\ 0 & \vec{F}_{N/2}} \nonumber \\
+	&= \myvec{\vec{f}_N^{1} & \ldots & \vec{f}_N^{N - 1} & \vec{f}_N^{2} & \ldots & \vec{f}_N^{N}}
+\end{align}
+and so,
+\begin{align}
+	&\mybvec{\vec{I}_{N/2} & \vec{D}_{N/2} \\ \vec{I}_{N/2} & -\vec{D}_{N/2}}\mybvec{\vec{F}_{N/2} & 0 \\ 0 & \vec{F}_{N/2}}\vec{P}_{N} \nonumber \\
+	&= \myvec{\vec{f}_N^{1} & \vec{f}_N^{2} & \ldots & \vec{f}_N^{N}} = \vec{F}_N
+\end{align}
+%%%%%%%%%%%%%%%%%%%%% 6 %%%%%%%%%%%%%%%%%%%%%%%
+\item Find 
+    \begin{align}
+	     \vec{P}_4 \vec{x}
+    \end{align}
+\solution We have,
+\begin{align}
+	\vec{P}_4\vec{x} = \myvec{\vec{e}_4^1 & \vec{e}_4^3 & \vec{e}_4^2 & \vec{e}_4^4}\myvec{x(0)\\x(1)\\x(2)\\x(3)} = \myvec{x(0)\\x(2)\\x(1)\\x(3)}
+	\label{eq:x-permute}
+\end{align}
+%%%%%%%%%%%%%%%%%%%%%% 7 %%%%%%%%%%%%%%%%%%%%%
+\item Show that 
+    \begin{align}
+	    \vec{X} = \vec{F}_N \vec{x}
+	    \label{eq:dft-mat-def}
+    \end{align}
+		where $\vec{x}, \vec{X}$ are the vector representations of $x(n), X(k)$ respectively.
+	\\\solution
+		\begin{equation}
+			X(k) \triangleq \sum_{n=0}^{N-1} x(n) e^{-j 2 \pi k n / N}, \quad k=0,1, \ldots, N-1
+		\end{equation}
+		This can be written as product of two matrices such as
+		\begin{equation}
+			\myvec{
+				W^{0}_{N} & W^{1}_{N} & ...& W^{N-1}_{N}\\
+				W^{0}_{N} & W^{2*1}_{N} & ...& W^{2*(N-1)}_{N}\\
+				.\\
+				.\\
+				.\\
+				W^{(N-1)*0}_{N} & W^{(N-1)*1}_{N} & ...& W^{(N-1)*(N-1)}_{N}\\
+			}
+			*
+			\myvec{
+			1 \\ 2 \\ 3 \\ 4 \\ 2 \\ 1
+			}
+		\end{equation}
+		The first matrix is $\vec{F_{N}}$ and the second is $\vec{x}$.
+		Hence
+		\begin{equation}
+			\vec{X} = \vec{F}_N \vec{x}
+		\end{equation}
+		Hence Proved
+
+%%%%%%%%%%%%%%%%%%%%%% Edited 8 %%%%%%%%%%%%%%%%
+\item Derive the following Step-by-step visualisation  of
+8-point FFTs into 4-point FFTs and so on
+\begin{equation}
+\begin{bmatrix}
+X(0) \\ 
+X(1) \\ 
+X(2) \\ 
+X(3)
+\end{bmatrix}
+=
+\begin{bmatrix}
+X_{1}(0) \\ 
+X_{1}(1)\\ 
+X_{1}(2)\\
+X_{1}(3)\\
+\end{bmatrix}
++
+\begin{bmatrix}
+W^{0}_{8} & 0 & 0 & 0\\
+0 & W^{1}_{8} & 0 & 0\\
+0 & 0 & W^{2}_{8} & 0\\
+0 & 0 & 0 & W^{3}_{8}
+\end{bmatrix}
+\begin{bmatrix}
+X_{2}(0) \\ 
+X_{2}(1) \\ 
+X_{2}(2) \\
+X_{2}(3)
+\end{bmatrix}
+\label{eq:8-low}
+\end{equation}
+\begin{equation}
+\begin{bmatrix}
+X(4) \\ 
+X(5) \\ 
+X(6) \\ 
+X(7)
+\end{bmatrix}
+=
+\begin{bmatrix}
+X_{1}(0) \\ 
+X_{1}(1)\\ 
+X_{1}(2)\\
+X_{1}(3)\\
+\end{bmatrix}
+-
+\begin{bmatrix}
+W^{0}_{8} & 0 & 0 & 0\\
+0 & W^{1}_{8} & 0 & 0\\
+0 & 0 & W^{2}_{8} & 0\\
+0 & 0 & 0 & W^{3}_{8}
+\end{bmatrix}
+\begin{bmatrix}
+X_{2}(0) \\ 
+X_{2}(1) \\ 
+X_{2}(2) \\
+X_{2}(3)
+\end{bmatrix}
+\label{eq:8-high}
+\end{equation}
+4-point FFTs into 2-point FFTs
+\begin{equation}
+\begin{bmatrix}
+X_{1}(0) \\ 
+X_{1}(1)\\ 
+\end{bmatrix}
+=
+\begin{bmatrix}
+X_{3}(0) \\ 
+X_{3}(1)\\ 
+\end{bmatrix}
++
+\begin{bmatrix}
+W^{0}_{4} & 0\\
+0 & W^{1}_{4}
+\end{bmatrix}
+\begin{bmatrix}
+X_{4}(0) \\ 
+X_{4}(1) \\ 
+\end{bmatrix}
+\label{eq:4-1-high}
+\end{equation}
+\begin{equation}
+\begin{bmatrix}
+X_{1}(2) \\ 
+X_{1}(3)\\ 
+\end{bmatrix}
+=
+\begin{bmatrix}
+X_{3}(0) \\ 
+X_{3}(1)\\ 
+\end{bmatrix}
+-
+\begin{bmatrix}
+W^{0}_{4} & 0\\
+0 & W^{1}_{4}
+\end{bmatrix}
+\begin{bmatrix}
+X_{4}(0) \\ 
+X_{4}(1) \\ 
+\end{bmatrix}
+\label{eq:4-1-low}
+\end{equation}
+\begin{equation}
+\begin{bmatrix}
+X_{2}(0) \\ 
+X_{2}(1)\\ 
+\end{bmatrix}
+=
+\begin{bmatrix}
+X_{5}(0) \\ 
+X_{5}(1)\\ 
+\end{bmatrix}
++
+\begin{bmatrix}
+W^{0}_{4} & 0\\
+0 & W^{1}_{4}
+\end{bmatrix}
+\begin{bmatrix}
+X_{6}(0) \\ 
+X_{6}(1) \\ 
+\end{bmatrix}
+\label{eq:4-2-high}
+\end{equation}
+\begin{equation}
+\begin{bmatrix}
+X_{2}(2) \\ 
+X_{2}(3)\\ 
+\end{bmatrix}
+=
+\begin{bmatrix}
+X_{5}(0) \\ 
+X_{5}(1)\\ 
+\end{bmatrix}
+-
+\begin{bmatrix}
+W^{0}_{4} & 0\\
+0 & W^{1}_{4}
+\end{bmatrix}
+\begin{bmatrix}
+X_{6}(0) \\ 
+X_{6}(1) \\ 
+\end{bmatrix}
+\label{eq:4-2-low}
+\end{equation}
+\begin{equation}
+P_{8}
+\begin{bmatrix}
+x(0) \\ 
+x(1) \\ 
+x(2) \\ 
+x(3) \\ 
+x(4) \\ 
+x(5) \\
+x(6) \\
+x(7)
+\end{bmatrix}
+ = 
+\begin{bmatrix}
+x(0) \\ 
+x(2) \\ 
+x(4) \\ 
+x(6) \\
+x(1) \\ 
+x(3) \\ 
+x(5) \\
+x(7)
+\end{bmatrix}
+\end{equation}
+\begin{equation}
+P_{4}
+\begin{bmatrix}
+x(0) \\ 
+x(2) \\ 
+x(4) \\ 
+x(6) \\
+\end{bmatrix}
+ = 
+\begin{bmatrix}
+x(0) \\ 
+x(4) \\ 
+x(2) \\
+x(6)
+\end{bmatrix}
+\end{equation}
+\begin{equation}
+P_{4}
+\begin{bmatrix}
+x(1) \\ 
+x(3) \\ 
+x(5) \\
+x(7)
+\end{bmatrix}
+ = 
+\begin{bmatrix}
+x(1) \\ 
+x(5) \\ 
+x(3) \\ 
+x(7) \\
+\end{bmatrix}
+\end{equation}
+Therefore,
+\begin{equation}
+\begin{bmatrix}
+X_{3}(0) \\ 
+X_{3}(1)\\ 
+\end{bmatrix}
+= F_{2}
+\begin{bmatrix}
+x(0) \\ 
+x(4) \\ 
+\end{bmatrix}
+\end{equation}
+\begin{equation}
+\begin{bmatrix}
+X_{4}(0) \\ 
+X_{4}(1)\\ 
+\end{bmatrix}
+= F_{2}
+\begin{bmatrix}
+x(2) \\ 
+x(6) \\ 
+\end{bmatrix}
+\end{equation}
+\begin{equation}
+\begin{bmatrix}
+X_{5}(0) \\ 
+X_{5}(1)\\ 
+\end{bmatrix}
+= F_{2}
+\begin{bmatrix}
+x(1) \\ 
+x(5) \\ 
+\end{bmatrix}
+\end{equation}
+\begin{equation}
+\begin{bmatrix}
+X_{6}(0) \\ 
+X_{6}(1)\\ 
+\end{bmatrix}
+= F_{2}
+\begin{bmatrix}
+x(3) \\ 
+x(7) \\ 
+\end{bmatrix}
+\end{equation}
+\solution We write out the values of performing an 8-point FFT on $\vec{x}$ as follows.
+\begin{align}
+	X(k) &= \sum_{n = 0}^{7}x(n)e^{-\frac{\text{\j}2kn\pi}{8}} \\
+		 &= \sum_{n = 0}^{3}\brak{x(2n)e^{-\frac{\text{\j}2kn\pi}{4}} + e^{-\frac{\text{\j}2k\pi}{8}}x(2n + 1)e^{-\frac{\text{\j}2kn\pi}{4}}} \\
+		 &= X_1(k) + e^{-\frac{\text{\j}2k\pi}{4}}X_2(k) 
+\end{align}
+where $\vec{X}_1$ is the 4-point FFT of the even-numbered terms and $\vec{X}_2$ is the 4-point FFT of the odd numbered terms. Noticing that for $k \geq 4$,
+\begin{align}
+	X_1(k) &= X_1(k - 4) \\
+	e^{-\frac{\text{\j}2k\pi}{8}} &= -e^{-\frac{\text{\j}2(k - 4)\pi}{8}}
+\end{align}
+we can now write out $X(k)$ in matrix form as in \eqref{eq:8-low} and \eqref{eq:8-high}. We also need to solve the two 4-point FFT terms so formed.
+\begin{align}
+	X_1(k) &= \sum_{n = 0}^{3}x_1(n)e^{-\frac{\text{\j}2kn\pi}{8}} \\
+		 &= \sum_{n = 0}^{1}\brak{x_1(2n)e^{-\frac{\text{\j}2kn\pi}{4}} + e^{-\frac{\text{\j}2k\pi}{8}}x_2(2n + 1)e^{-\frac{\text{\j}2kn\pi}{4}}} \\
+		 &= X_3(k) + e^{-\frac{\text{\j}2k\pi}{4}}X_4(k) 
+\end{align}
+using $x_1(n) = x(2n)$ and $x_2(n) = x(2n + 1)$. Thus we can write the 2-point FFTs
+\begin{align}
+\begin{bmatrix}
+X_{3}(0) \\ 
+X_{3}(1)\\ 
+\end{bmatrix}
+= F_{2}
+\begin{bmatrix}
+x(0) \\ 
+x(4) \\ 
+\end{bmatrix} \\
+\begin{bmatrix}
+X_{4}(0) \\ 
+X_{4}(1)\\ 
+\end{bmatrix}
+= F_{2}
+\begin{bmatrix}
+x(2) \\ 
+x(6) \\ 
+\end{bmatrix}
+\end{align}
+Using a similar idea for the terms $X_2$, 
+\begin{align}
+\begin{bmatrix}
+X_{5}(0) \\ 
+X_{5}(1)\\ 
+\end{bmatrix}
+= F_{2}
+\begin{bmatrix}
+x(1) \\ 
+x(5) \\ 
+\end{bmatrix} \\
+\begin{bmatrix}
+X_{6}(0) \\ 
+X_{6}(1)\\ 
+\end{bmatrix}
+= F_{2}
+\begin{bmatrix}
+x(3) \\ 
+x(7) \\ 
+\end{bmatrix}
+\end{align}
+But observe that from \eqref{eq:x-permute},
+\begin{align}
+	\vec{P}_8\vec{x} &= \myvec{\vec{x}_1\\\vec{x}_2} \\
+	\vec{P}_4\vec{x}_1 &= \myvec{\vec{x}_3\\\vec{x}_4} \\ 
+	\vec{P}_4\vec{x}_2 &= \myvec{\vec{x}_5\\\vec{x}_6}
+\end{align}
+where we define $x_3(k) = x(4k)$, $x_4(k) = x(4k + 2)$, $x_5(k) = x(4k + 1)$, and $x_6(k) = x(4k + 3)$ for $k = 0, 1$.
+
+%%%%%%%%%%%%%%%%%%%% 8 %%%%%%%%%%%%%%%%%%%%%%
+% 	\item 
+% Let 
+% \begin{equation}
+% 	\myvec{
+% X_{1}(0) \\ 
+% X_{1}(1) \\ 
+% X_{1}(2) 
+% 	}
+% = F_{3}
+% 	\myvec{
+% x(0) \\ 
+% x(2) \\ 
+% x(4) 
+% 	}
+% \end{equation}
+% \begin{equation}
+% 	\myvec{
+% X_{2}(0) \\ 
+% X_{2}(1) \\ 
+% X_{2}(2) 
+% 	}
+% = F_{3}
+% 	\myvec{
+% x(1) \\ 
+% x(3) \\ 
+% x(5) 
+% 	}
+% \end{equation}
+% Show that 
+% \begin{equation}
+% 	\myvec{
+% X(0) \\ 
+% X(1) \\ 
+% X(2)  
+% 	}
+% =
+% 	\myvec{
+% X_{1}(0) \\ 
+% X_{1}(1)\\ 
+% X_{1}(2)
+% 	}
+% +
+% 	\myvec{
+% W^{0}_{6} & 0 & 0\\
+% 0 & W^{1}_{6} & 0\\
+% 0 & 0 & W^{2}_{6}\\
+% 	}
+% 	\myvec{
+% X_{2}(0) \\ 
+% X_{2}(1) \\ 
+% X_{2}(2)
+% 	}
+% \end{equation}
+% \begin{equation}
+% 	\myvec{
+% X(3) \\ 
+% X(4) \\ 
+% X(5) 
+% 	}
+% =
+% 	\myvec{
+% X_{1}(0) \\ 
+% X_{1}(1)\\ 
+% X_{1}(2)
+% 	}
+% -
+% 	\myvec{
+% W^{0}_{6} & 0 & 0\\
+% 0 & W^{1}_{6} & 0\\
+% 0 & 0 & W^{2}_{6}
+% 	}
+% 	\myvec{
+% X_{2}(0) \\ 
+% X_{2}(1) \\ 
+% X_{2}(2)
+% 	}
+% 	    \label{eq:fft-mat-def}
+% \end{equation}
+% \solution
+% We Know that 
+% \begin{equation}
+%     \vec{F}_{6}=
+%     \begin{bmatrix}
+%         \vec{I}_{3} & \vec{D}_{3} \\
+%     \vec{I}_{3} & -\vec{D}_{3}
+%     \end{bmatrix}
+%     \begin{bmatrix}
+%     \vec{F}_{3} & 0 \\
+%     0 & \vec{F}_{3}
+%     \end{bmatrix}
+%     \vec{P}_{3}
+% \end{equation}
+% and 
+% \begin{equation}
+%     \vec{X} = \vec{F_{N}} \vec{x}
+% \end{equation}
+% But 
+% \begin{equation}
+%     \vec{P_{6}}\vec{x} = 
+%     \myvec{
+%         x(0)\\
+%         x(2)\\
+%         x(4)\\
+%         x(1)\\
+%         x(3)\\
+%         x(6)\\
+%     }
+% \end{equation}
+% and
+% \begin{equation} 
+%     \vec{X} = 
+%     \begin{bmatrix}
+%         \vec{I}_{3} & \vec{D}_{3} \\
+%     \vec{I}_{3} & -\vec{D}_{3}
+%     \end{bmatrix}
+%     \begin{bmatrix}
+%     \vec{F}_{3} & 0 \\
+%     0 & \vec{F}_{3}
+%     \end{bmatrix}
+%     \vec{P}_{3}
+%     \vec{x}
+% \end{equation} 
+% This can also be written as 
+% \begin{equation}
+%     \vec{X} = 
+%     \begin{bmatrix}
+%         \vec{F_{3}} + \vec{D_{3}}\vec{F_{3}} \\
+%         \vec{F_{3}} - \vec{D_{3}}\vec{F_{3}} \\
+%     \end{bmatrix}
+%     \vec{P_{3}}\vec{x}
+% \end{equation}
+% Hence,
+% \begin{equation}
+%     \vec{X} = 
+%     \begin{bmatrix}
+%         \myvec{
+% X_{1}(0) \\ 
+% X_{1}(1)\\ 
+% X_{1}(2)
+% 	}
+% +
+% 	\myvec{
+% W^{0}_{6} & 0 & 0\\
+% 0 & W^{1}_{6} & 0\\
+% 0 & 0 & W^{2}_{6}\\
+% 	}
+% 	\myvec{
+% X_{2}(0) \\ 
+% X_{2}(1) \\ 
+% X_{2}(2)
+% 	} \\
+%     \myvec{
+% X_{1}(0) \\ 
+% X_{1}(1)\\ 
+% X_{1}(2)
+% 	}
+% -
+% 	\myvec{
+% W^{0}_{6} & 0 & 0\\
+% 0 & W^{1}_{6} & 0\\
+% 0 & 0 & W^{2}_{6}
+% 	}
+% 	\myvec{
+% X_{2}(0) \\ 
+% X_{2}(1) \\ 
+% X_{2}(2)
+% 	}
+% \end{bmatrix}    
+% \end{equation}
+% Hence Proved. 
+%%%%%%%%%%%%%%%%%%%%%%%%%% 9 %%%%%%%%%%%%%%%%%
+\item For 
+    \begin{align}
+	    \vec{x} = \myvec{1\\2\\3\\4\\2\\1}
+        \label{eq:equation1}
+    \end{align}
+    compute the DFT using 
+	    \eqref{eq:dft-mat-def}
+	\\\solution
+		\begin{equation}
+			\vec{X} = \vec{F_{6}}\vec{x}
+		\end{equation}
+		\begin{equation}
+			\myvec{
+				W^{0}_{N} & W^{0}_{N} & ...& W^{0}_{N}\\
+				W^{0}_{N} & W^{1    *1}_{N} & ...& W^{1*(N-1)}_{N}\\
+				.\\
+				.\\
+				.\\
+				W^{(N-1)*0}_{N} & W^{(N-1)*1}_{N} & ...& W^{(N-1)*(N-1)}_{N}\\
+			}
+			*
+			\myvec{
+			1 \\ 2 \\ 3 \\ 4 \\ 2 \\ 1
+			}
+		\end{equation}
+		This will turn out to be.
+		\begin{equation}
+			\vec{X} = 
+			\myvec{
+				W^{0}_{6} + 2W^{0}_{6} +  3W^{0}_{6} + 4W^{0}_{6} +  2W^{0}_{6} +  W^{0}_{6}\\
+				W^{0}_{6} + 2W^{1}_{6} +  3W^{2}_{6} + 4W^{3}_{6} +  2W^{4}_{6} +  W^{5}_{6}\\
+				W^{0}_{6} + 2W^{2}_{6} +  3W^{4}_{6} + 4W^{6}_{6} +  2W^{2}_{6} +  W^{4}_{6}\\
+				W^{0}_{6} + 2W^{3}_{6} +  3W^{6}_{6} + 4W^{3}_{6} +  2W^{0}_{6} +  W^{3}_{6}\\
+				W^{0}_{6} + 2W^{4}_{6} +  3W^{2}_{6} + 4W^{0}_{6} +  2W^{4}_{6} +  W^{2}_{6}\\
+				W^{0}_{6} + 2W^{5}_{6} +  3W^{4}_{6} + 4W^{3}_{6} +  2W^{2}_{6} +  W^{1}_{6}
+			}
+		\end{equation}
+		The final result will be.
+		\begin{equation}
+			\vec{x}=
+			\myvec{
+				13\\
+				-4-\sqrt{3}\text{\j} \\
+				1 \\
+				-1 \\
+				1 \\
+				-4 + \sqrt{3}\text{\j}
+			}
+		\end{equation}
+%%%%%%%%%%%%%%%%%%%%%%%%% 10 %%%%%%%%%%%%%%%%%%%%%
+    \item Repeat the above exercise using
+	    FFT after zero padding \\
+		\solution
+		\begin{equation}
+			\vec{F_{3}} = 
+			\myvec{
+				W^{0}_{3} & W^{0}_{3} & W^{0}_{3}\\
+				W^{0}_{3} & W^{1}_{3} & W^{2}_{3}\\
+				W^{0}_{3} & W^{2}_{3} & W^{4}_{3}\\
+			}
+		\end{equation}
+		\begin{equation}
+			\vec{F_{3}} = 
+			\myvec{
+				1 & 1 & 1\\
+				1 & W^{1}_{3} & W^{2}_{3}\\
+				1 & W^{2}_{3} & W^{1}_{3}\\
+			}
+		\end{equation}
+		\begin{equation}
+			\myvec{X_{1}(0)\\ X_{1}(1)\\ X_{1}(2)} = 
+			\myvec{
+				1 & 1 & 1\\
+				1 & W^{1}_{3} & W^{2}_{3}\\
+				1 & W^{2}_{3} & W^{1}_{3}\\
+			}
+			*
+			\myvec{1\\ 3\\ 2}
+		\end{equation}
+		\begin{equation}
+			\myvec{X_{1}(0)\\ X_{1}(1)\\ X_{1}(2)} = 
+			\myvec{
+				6 \\
+				-1.5 - \frac{\sqrt{3}}{2}*\text{\j}\\
+				-1.5 + \frac{\sqrt{3}}{2}*\text{\j}
+			}
+		\end{equation}
+		Similarly
+		\begin{equation}
+			\myvec{X_{2}(0)\\ X_{2}(1)\\ X_{2}(2)} = 
+			\myvec{
+				6 \\
+				-0.5 - \frac{3\sqrt{3}}{2}*\text{\j}\\
+				-0.5 + \frac{3\sqrt{3}}{2}*\text{\j}
+			}
+		\end{equation}
+		\begin{equation}
+			\myvec{
+				W^{0}_{6} & 0 & 0\\ 
+				0 & W^{1}_{6} & 0\\ 
+				0 & 0 & W^{2}_{6}\\ 
+			}
+			*
+			\myvec{X_{2}(0)\\ X_{2}(1)\\ X_{2}(2)} = 
+			\myvec{X_{2}(0)\\ W^{1}_{6}*X_{2}(1)\\ W^{2}_{6}*X_{2}(2)}
+		\end{equation}
+		Now 
+		\begin{align}
+			\myvec{X(0) \\ X(1) \\ X(2)} = 
+			\myvec{X_{1}(0)\\ X_{1}(1)\\ X_{1}(2)} +
+			\myvec{
+				W^{0}_{6} & 0 & 0\\ 
+				0 & W^{1}_{6} & 0\\ 
+				0 & 0 & W^{2}_{6}\\ 
+			}
+			*
+			\myvec{X_{2}(0)\\ X_{2}(1)\\ X_{2}(2)}\\
+			\myvec{X(0) \\ X(1) \\ X(2)} = 
+			\myvec{
+				13\\
+				-4-\sqrt{3}\text{\j} \\
+				1
+			}
+		\end{align}
+		similarly 
+		\begin{align}
+			\myvec{X(3) \\ X(4) \\ X(5)} = 
+			\myvec{X_{1}(0)\\ X_{1}(1)\\ X_{1}(2)} -
+			\myvec{
+				W^{0}_{6} & 0 & 0\\ 
+				0 & W^{1}_{6} & 0\\ 
+				0 & 0 & W^{2}_{6}\\ 
+			}
+			*
+			\myvec{X_{2}(0)\\ X_{2}(1)\\ X_{2}(2)}\\
+			\myvec{X(3) \\ X(4) \\ X(5)} = 
+			\myvec{
+				-1 \\
+				1 \\
+				-4 + \sqrt{3}\text{\j}
+			}
+		\end{align}
+		Hence The final result will be.
+		\begin{equation}
+			\vec{x}=
+			\myvec{
+				13\\
+				-4-\sqrt{3}\text{\j} \\
+				1 \\
+				-1 \\
+				1 \\
+				-4 + \sqrt{3}\text{\j}
+			}
+		\end{equation}
+		
+%%%%%%%%%%%%%%%%%%%%%%%%%%% 11 %%%%%%%%%%%%%%%%%%%%%%%
+\item Write a C program to compute the 8-point FFT. 
+
+\solution The following code calculates the 8-point fft of $x(n)$ in \ref{def:xn}
+\begin{lstlisting}
+    https://github.com/DeepakReddyVelagala/EE3900/blob/main/EE3900-2022-main/filter/codes/8_point_FFT.c
+\end{lstlisting}
+%\lstinputlisting{./codes/8_point_fft.c}
+\begin{figure}[!htb]
+	\includegraphics[width=\columnwidth]{figs/6_7_2.png}
+	\caption{Complexity of convolution}
+	\label{fig:conv-com}
+	\end{figure}
+
+\begin{figure}[!htb]
+	\includegraphics[width=\columnwidth]{figs/complexity.png}
+	\caption{Complexity of FFT}
+	\label{fig:FFT-com}
+	\end{figure}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% Exercices %%%%%%%%%%%%%%%%%%%%
+\section{Exercises}
 Answer the following questions by looking at the python code in Problem \ref{prob:output}.
 \begin{enumerate}[label=\thesection.\arabic*]
 \item
@@ -608,11 +1637,92 @@ in Problem \ref{prob:output} is executed through the following difference equati
 where the input signal is $x(n)$ and the output signal is $y(n)$ with initial values all 0. Replace
 \textbf{signal.filtfilt} with your own routine and verify.
 %
-\item Repeat all the exercises in the previous sections for the above $a$ and $b$.
+\solution 
+\begin{lstlisting}
+    https://github.com/DeepakReddyVelagala/EE3900/blob/main/EE3900-2022-main/filter/codes/7_1.py
+\end{lstlisting}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% 8.2 %%%%%%%%%%%%%%%%%
+\item Repeat all the exercises in the previous sections for the above $a$ and $b$.
+\solution
+For the given values, the difference equation is
+\begin{align}
+	&y(n) - \brak{4.44}y(n - 1) + \brak{8.78}y(n - 2) \nonumber \\
+	&- \brak{9.93}y(n - 3) + \brak{6.90}y(n - 4) \nonumber \\
+	&- \brak{2.93}y(n - 5) \nonumber + \brak{0.70}y(n - 6) \nonumber \\
+	&- \brak{0.07}y(n - 7) = \brak{5.02 \times 10^{-5}}x(n) \nonumber \\
+	&+ \brak{3.52 \times 10^{-4}}x(n - 1) + \brak{1.05 \times 10^{-3}}x(n - 2) \nonumber \\
+	&+ \brak{1.76 \times 10^{-3}}x(n - 3) + \brak{1.76 \times 10^{-3}}x(n - 4) \nonumber \\
+	&+ \brak{1.05 \times 10^{-3}}x(n - 5) + \brak{3.52 \times 10^{-4}}x(n - 6) \nonumber \\
+	&+ \brak{5.02 \times 10^{-5}}x(n - 7)
+\end{align}
+From \eqref{eq:iir_filter_gen}, we see that the transfer function can be written as follows
+\begin{align}
+	H(z) &= \frac{\sum_{k = 0}^{N}b(k)z^{-k}}{\sum_{k = 0}^{M}a(k)z^{-k}} \\
+		 &= \sum_{i}\frac{r(i)}{1 - p(i)z^{-1}} + \sum_{j}k(j)z^{-j}
+	\label{eq:trans-func}
+\end{align}
+where $r(i)$, $p(i)$, are called residues and poles respectively of the partial 
+fraction expansion of $H(z)$. $k(i)$ are the coefficients of the direct polynomial 
+terms that might be left over. We can now take the inverse $z$-transform of
+\eqref{eq:trans-func} and get using \eqref{eq:anun},
+\begin{align}
+	h(n) &= \sum_{i}r(i)[p(i)]^nu(n) + \sum_{j}k(j)\delta(n - j)
+	\label{eq:h-n-expr}
+\end{align}
+Substituting the values,
+\begin{align}
+	&h(n) = [\brak{2.76}\brak{0.55}^n \nonumber \\ 
+	&+ \brak{-1.05-1.84\j}\brak{0.57+0.16\j}^n \nonumber \\
+	&+ \brak{-1.05+1.84\j}\brak{0.57-0.16\j}^n \nonumber \\
+	&+ \brak{-0.53+0.08\j}\brak{0.63+0.32\j}^n \nonumber \\
+	&+ \brak{-0.53-0.08\j}\brak{0.63-0.32\j}^n \nonumber \\
+	&+ \brak{0.20+0.004\j}\brak{0.75+0.47\j}^n \nonumber \\
+	&+ \brak{0.20-0.004\j}\brak{0.75-0.47\j}^n]u(n) \nonumber \\
+	&+ \brak{-6.81 \times 10^{-4}}\delta(n)
+\end{align}
+
+The values $r(i)$, $p(i)$, $k(i)$ and thus the impulse response function are computed and plotted at
+\begin{lstlisting}
+    https://github.com/DeepakReddyVelagala/EE3900/blob/main/EE3900-2022-main/filter/codes/7_2_1.py
+\end{lstlisting}
+The filter frequency response is plotted at
+\begin{lstlisting}
+    https://github.com/DeepakReddyVelagala/EE3900/blob/main/EE3900-2022-main/filter/codes/7_2_2.py
+\end{lstlisting}
+Observe that for a series $t_n = r^n$, $\frac{t_{n + 1}}{t_n} = r$.
+By the ratio test, $t_n$ converges if $|r| < 1$. We note that
+observe that $|p(i)| < 1$ and so, as $h(n)$ is the sum of convergent series,
+we see that $h(n)$ converges. From Fig. \eqref{fig:butter-imp}, it is clear
+that $h(n)$ is bounded. From \eqref{eq:z_trans},
+\begin{align}
+	\sum_{n = 0}^{\infty}h(n) = H(1) = 1 < \infty
+\end{align}
+Therefore, the system is stable. From
+Fig. \eqref{fig:butter-imp}, $h(n)$ is negligible after $n \geq 64$, and we
+can apply a 64-bit FFT to get y(n). The following code uses the DFT matrix
+to generate $y(n)$ in Fig. \eqref{fig:butter-out}.
+\begin{lstlisting}
+    https://github.com/DeepakReddyVelagala/EE3900/blob/main/EE3900-2022-main/filter/codes/7_2_3.py~
+\end{lstlisting}
+\begin{figure}[!htb]
+\includegraphics[width=\columnwidth]{figs/7_2_1.png}
+\caption{Plot of $h(n)$}
+\label{fig:butter-imp}
+\end{figure}
+\begin{figure}[!htb]
+\includegraphics[width=\columnwidth]{figs/7_2_2.png}
+\caption{Filter frequency response}
+\label{fig:butter-resp}
+\end{figure}
+\begin{figure}[!htb]
+\includegraphics[width=\columnwidth]{figs/7_2_3.png}
+\caption{Plot of $y(n)$}
+\label{fig:butter-out}
+\end{figure}
 \item What is the sampling frequency of the input signal?
 \\
-\solution
+\solution run the following code to 
 Sampling frequency(fs)=44.1kHZ.
 \item
 What is type, order and  cutoff-frequency of the above butterworth filter
@@ -622,8 +1732,7 @@ The given butterworth filter is low pass with order=2 and cutoff-frequency=4kHz.
 %
 \item
 Modifying the code with different input parameters and to get the best possible output.
+\\\solution a better filtering was found on changing the order of filter to 7.
 %
 \end{enumerate}
-
 \end{document}
-
